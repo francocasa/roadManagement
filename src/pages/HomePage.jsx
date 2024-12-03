@@ -1,10 +1,13 @@
+import Map from "./../components/map/Map";
+import "maplibre-gl/dist/maplibre-gl.css";
+import "./map.css";
 const HomePage = () => {
   return (
-    <div className=" text-white p-4">
-      <h1 className="text-4xl font-bold">
-        ¡Bienvenido(a) a mi aplicación con Tailwind!
-      </h1>
-    </div>
+    <main className="container mx-auto p-8">
+      <section className="mx-9">
+        <Map />
+      </section>
+    </main>
   );
 };
 
