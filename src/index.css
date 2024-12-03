@@ -66,3 +66,15 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+#root {
+  padding-top: 70px;
+}
+
+main {
+  flex: 1;
+}
+
