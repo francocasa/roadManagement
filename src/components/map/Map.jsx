@@ -8,7 +8,7 @@ const Map = () => {
   const lng = -76.98937836368721;
   const lat = -12.076365861631718;
   const zoom = 14;
-  const API_KEY = "wFsm7RvZB3i56B1sEk2n";
+  const API_KEY = import.meta.env.VITE_REACT_MAPLIBRE_API_KEY;
   const [postalCode, setPostalCode] = useState(null);
   const [markers, setMarkers] = useState([]);
   const [mark, setMark] = useState([]);
@@ -53,7 +53,7 @@ const Map = () => {
   };
 
   const getPostalCode = async (lng, lat) => {
-    const apiKey = "8442a4ea01014d029f028b6c79f30971"; // Reemplaza con tu API Key de OpenCage
+    const apiKey = import.meta.env.VITE_REACT_OPENCAGE_API_KEY; // Reemplaza con tu API Key de OpenCage
     const url = `https://api.opencagedata.com/geocode/v1/json?q=${lat}+${lng}&key=${apiKey}`;
 
     try {
