@@ -10,7 +10,7 @@ const Map = () => {
   const zoom = 14;
   const API_KEY = import.meta.env.VITE_REACT_MAPLIBRE_API_KEY;
   const [postalCode, setPostalCode] = useState(null);
-  const [markers, setMarkers] = useState([]);
+  const [/*markers,*/ setMarkers] = useState([]);
   const [mark, setMark] = useState([]);
 
   useEffect(() => {
@@ -38,19 +38,22 @@ const Map = () => {
 
   const addMarker = () => {
     if (map.current) {
-      const marker = new maplibregl.Marker({ color: "#FF0000" })
+      const marker = new maplibregl.Marker({
+        color: "#FF4000",
+        scale: 0.5,
+      })
         .setLngLat([mark[0], mark[1]])
         .addTo(map.current);
       setMarkers((prevMarkers) => [...prevMarkers, marker]);
     }
   };
 
-  const removeMarker = (index) => {
-    if (markers[index]) {
-      markers[index].remove(); // Eliminar la marca específica
-      setMarkers((prevMarkers) => prevMarkers.filter((_, i) => i !== index)); // Eliminarla del estado
-    }
-  };
+  // const removeMarker = (index) => {
+  //   if (markers[index]) {
+  //     markers[index].remove(); // Eliminar la marca específica
+  //     setMarkers((prevMarkers) => prevMarkers.filter((_, i) => i !== index)); // Eliminarla del estado
+  //   }
+  // };
 
   const getPostalCode = async (lng, lat) => {
     const apiKey = import.meta.env.VITE_REACT_OPENCAGE_API_KEY; // Reemplaza con tu API Key de OpenCage
@@ -59,10 +62,10 @@ const Map = () => {
     try {
       const response = await fetch(url);
       const data = await response.json();
-      console.log("Data:", data);
 
       if (data.results.length > 0) {
         const code = data.results[0].components.postcode;
+        console.log(data.results);
         setPostalCode(code); // Actualizar el estado con el código postal
       } else {
         setPostalCode("Código postal no encontrado");
