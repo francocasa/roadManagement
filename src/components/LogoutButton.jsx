@@ -3,9 +3,15 @@ const LogoutButton = () => {
   const { logout } = useAuth0();
 
   return (
-    <main className="container mx-auto p-8">
-      <button onClick={() => logout()}>Logout</button>
-    </main>
+    <form className="p-6 rounded shadow-md w-full max-w-sm mx-auto">
+      <button
+        type="submit"
+        className="bg-blue-500 text-white p-2 rounded w-full hover:bg-blue-600 transition mt-3"
+        onClick={() => logout()}
+      >
+        Log Out
+      </button>
+    </form>
   );
 };
 
