@@ -1,7 +1,9 @@
 import { useRef, useEffect, useState } from "react";
 import maplibregl from "maplibre-gl";
+import RoadDevice from "./RoadDevice";
 import "maplibre-gl/dist/maplibre-gl.css";
 import "./../../pages/map.css";
+import axios from "axios";
 const Map = () => {
   const mapContainer = useRef(null);
   const map = useRef(null);
@@ -9,9 +11,13 @@ const Map = () => {
   const lat = -12.076365861631718;
   const zoom = 14;
   const API_KEY = import.meta.env.VITE_REACT_MAPLIBRE_API_KEY;
-  const [postalCode, setPostalCode] = useState(null);
-  const [/*markers,*/ setMarkers] = useState([]);
+  const [marker /*setMarker*/] = useState(null);
+  const [roadDevices, setRoadDevices] = useState([]);
+  const [, /*markers*/ setMarkers] = useState([]);
   const [mark, setMark] = useState([]);
+  const [, /*address*/ setAddress] = useState("");
+  const [, /*block*/ setBlock] = useState("");
+  const [, /*loading*/ setLoading] = useState(false);
 
   useEffect(() => {
     if (map.current) return; // stops map from intializing more than once
@@ -28,7 +34,7 @@ const Map = () => {
     map.current.on("click", (e) => {
       const { lng, lat } = e.lngLat; // Obtener las coordenadas del clic
       setMark([lng, lat]);
-      getPostalCode(lng, lat); // Obtener el código postal
+      getAddressFromCoordinates(lng, lat); // Obtener el código postal
     });
 
     // return () => {
@@ -45,6 +51,7 @@ const Map = () => {
         .setLngLat([mark[0], mark[1]])
         .addTo(map.current);
       setMarkers((prevMarkers) => [...prevMarkers, marker]);
+      setRoadDevices([...roadDevices, <RoadDevice key={roadDevices.length} />]);
     }
   };
 
@@ -55,44 +62,73 @@ const Map = () => {
   //   }
   // };
 
-  const getPostalCode = async (lng, lat) => {
+  const getAddressFromCoordinates = async (lon, lat) => {
+    setLoading(true);
     const apiKey = import.meta.env.VITE_REACT_OPENCAGE_API_KEY; // Reemplaza con tu API Key de OpenCage
-    const url = `https://api.opencagedata.com/geocode/v1/json?q=${lat}+${lng}&key=${apiKey}`;
-
     try {
-      const response = await fetch(url);
-      const data = await response.json();
+      const response = await axios.get(
+        `https://api.opencagedata.com/geocode/v1/json`,
+        {
+          params: {
+            q: `${lat},${lon}`,
+            key: apiKey, // Tu clave de API
+            language: "es", // Puedes cambiar el idioma según lo necesites
+            pretty: 1, // Resultados más legibles
+            no_annotations: 1, // Opcional: Evitar anotar datos extra
+          },
+        }
+      );
 
-      if (data.results.length > 0) {
-        const code = data.results[0].components.postcode;
-        console.log(data.results);
-        setPostalCode(code); // Actualizar el estado con el código postal
+      const addressData = response.data.results[0];
+      if (addressData) {
+        setAddress(addressData.formatted); // Dirección formateada completa
+        // Buscar detalles adicionales en los componentes de la dirección
+        const components = addressData.components;
+
+        // Aquí tratamos de encontrar un número de cuadra o manzana si está disponible
+        if (components.road && components.house_number) {
+          setBlock(
+            `Número de cuadra: ${components.road}, No. ${components.house_number}`
+          );
+        } else if (components.road) {
+          setBlock(`Calle: ${components.road}`);
+        } else {
+          setBlock("Número de cuadra no encontrado");
+        }
       } else {
-        setPostalCode("Código postal no encontrado");
+        setAddress("Dirección no encontrada");
       }
     } catch (error) {
-      console.error("Error al obtener el código postal:", error);
-      setPostalCode("Error al obtener el código postal");
+      console.error("Error al obtener la dirección:", error);
+      setAddress("Error al obtener la dirección");
+      setBlock("Error al obtener el número de cuadra");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div>
       <div>
-        {postalCode ? (
+        {marker ? (
           <>
-            <p className="">Código Postal: {postalCode}</p>
+            <p className="">Marcador: {marker}</p>
             <button
               type="button"
               className="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
               onClick={addMarker}
             >
-              Green
+              Agregar dispositivo vial
             </button>
           </>
         ) : (
-          <p>Haz clic en el mapa para obtener el código postal.</p>
+          <p>Ningun marcador por configurar</p>
         )}
+        <div>
+          {roadDevices.map((component, index) => (
+            <div key={index}>{component}</div>
+          ))}
+        </div>
       </div>
       <div className="map-wrap">
         <div ref={mapContainer} className="map" />

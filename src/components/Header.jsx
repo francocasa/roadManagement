@@ -29,8 +29,15 @@ const Header = () => {
     !isMenuOpen ? "hidden" : ""
   } justify-between w-full md:w-auto md:flex-grow md:flex md:order-1`;
 
+  const navStyle = {
+    backgroundColor: "#242424",
+  };
+
   return (
-    <nav className="fixed w-full z-20 top-0 start-0 border-b border-gray-200 shadow-md">
+    <nav
+      className="fixed w-full z-20 top-0 start-0 border-b border-gray-200 shadow-md"
+      style={navStyle}
+    >
       <div className="container flex flex-wrap items-center justify-between mx-auto p-3 md:p-3 lg:p-4">
         <div className="-mb-1 lg:w-72">
           <img src="/Logo.png" alt="Gestión de vias" className="w-36" />
@@ -51,7 +58,7 @@ const Header = () => {
           <ul className="flex flex-col p-2 md:p-0 mt-2 mb-3 font-medium text-sm border border-gray-100 rounded-lg md:space-x-0 mx-auto rtl:space-x-reverse md:flex-row md:my-0 md:border-0 lg:text-base">
             <li>
               <Link
-                to="/"
+                to="/maps"
                 className="block w-32 py-2 px-3 text-white rounded hover:bg-blue-100 transition-colors"
               >
                 Mapas
@@ -59,7 +66,7 @@ const Header = () => {
             </li>
             <li>
               <Link
-                to="/products"
+                to="/lists"
                 className="block w-32 py-2 px-3 text-white rounded hover:bg-blue-100 transition-colors"
               >
                 Listados
@@ -74,12 +81,6 @@ const Header = () => {
                 className="cursor-pointer text-2xl lg:text-[30px]"
               />
             </Link>
-            {/* <Link to="/cart" className="relative">
-              <Cart3
-                color="white"
-                className="cursor-pointer text-xl lg:text-[26px]"
-              />
-            </Link> */}
           </div>
         </div>
       </div>
