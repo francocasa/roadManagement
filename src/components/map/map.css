@@ -1,10 +1,10 @@
 .map-wrap {
-  width: 50%;
+  width: 70%;
   height: calc(100vh); /* calculate height of the screen minus the heading */
 }
 
 .map {
   position: absolute;
-  width: 50%;
+  width: 70%;
   height: 50%;
 }

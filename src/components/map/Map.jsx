@@ -2,90 +2,82 @@ import { useRef, useEffect, useState } from "react";
 import maplibregl from "maplibre-gl";
 import RoadDevice from "./RoadDevice";
 import "maplibre-gl/dist/maplibre-gl.css";
-import "./../../pages/map.css";
+import "./map.css";
 import axios from "axios";
+
 const Map = () => {
   const mapContainer = useRef(null);
   const map = useRef(null);
+  const marker = useRef(null); // Usamos useRef para almacenar el marcador
   const lng = -76.98937836368721;
   const lat = -12.076365861631718;
   const zoom = 14;
   const API_KEY = import.meta.env.VITE_REACT_MAPLIBRE_API_KEY;
-  const [marker /*setMarker*/] = useState(null);
   const [roadDevices, setRoadDevices] = useState([]);
-  const [, /*markers*/ setMarkers] = useState([]);
-  const [mark, setMark] = useState([]);
-  const [, /*address*/ setAddress] = useState("");
-  const [, /*block*/ setBlock] = useState("");
-  const [, /*loading*/ setLoading] = useState(false);
+  const [stateMarker, setStateMarker] = useState(null);
+  const [, setMarkers] = useState([]);
+  const [, setAddress] = useState("");
+  const [, setBlock] = useState("");
+  const [, setLoading] = useState(false);
 
   useEffect(() => {
-    if (map.current) return; // stops map from intializing more than once
+    if (map.current) return; // Evita que el mapa se inicialice más de una vez
 
+    // Crear el mapa
     map.current = new maplibregl.Map({
       container: mapContainer.current,
       style: `https://api.maptiler.com/maps/streets-v2/style.json?key=${API_KEY}`,
       center: [lng, lat],
       zoom: zoom,
     });
+
+    // Añadir controles de navegación
     map.current.addControl(new maplibregl.NavigationControl(), "top-right");
 
-    // Manejar el evento de clic en el mapa
+    // Evento de clic en el mapa
     map.current.on("click", (e) => {
-      const { lng, lat } = e.lngLat; // Obtener las coordenadas del clic
-      setMark([lng, lat]);
-      getAddressFromCoordinates(lng, lat); // Obtener el código postal
-    });
+      const { lng, lat } = e.lngLat; // Obtener las coordenadas donde se hace clic
 
-    // return () => {
-    //   map.current.remove(); // Limpiar el mapa al desmontar el componente
-    // };
-  }, [API_KEY, lng, lat, zoom]);
+      // Eliminar el marcador anterior si existe
+      if (marker.current) {
+        marker.current.remove(); // Eliminar el marcador anterior
+      }
 
-  const addMarker = () => {
-    if (map.current) {
-      const marker = new maplibregl.Marker({
+      // Crear un nuevo marcador
+      const new_marker = new maplibregl.Marker({
         color: "#FF4000",
         scale: 0.5,
       })
-        .setLngLat([mark[0], mark[1]])
-        .addTo(map.current);
-      setMarkers((prevMarkers) => [...prevMarkers, marker]);
-      setRoadDevices([...roadDevices, <RoadDevice key={roadDevices.length} />]);
-    }
-  };
+        .setLngLat([lng, lat]) // Establecer las coordenadas del marcador
+        .addTo(map.current); // Añadirlo al mapa
 
-  // const removeMarker = (index) => {
-  //   if (markers[index]) {
-  //     markers[index].remove(); // Eliminar la marca específica
-  //     setMarkers((prevMarkers) => prevMarkers.filter((_, i) => i !== index)); // Eliminarla del estado
-  //   }
-  // };
+      // Actualizar la referencia del marcador
+      marker.current = new_marker;
+      setStateMarker(new_marker);
+    });
+  }, []); // Este efecto se ejecuta solo una vez cuando se monta el componente
 
+  // Función para obtener la dirección a partir de las coordenadas
   const getAddressFromCoordinates = async (lon, lat) => {
     setLoading(true);
-    const apiKey = import.meta.env.VITE_REACT_OPENCAGE_API_KEY; // Reemplaza con tu API Key de OpenCage
+    const apiKey = import.meta.env.VITE_REACT_OPENCAGE_API_KEY;
     try {
       const response = await axios.get(
         `https://api.opencagedata.com/geocode/v1/json`,
         {
           params: {
             q: `${lat},${lon}`,
-            key: apiKey, // Tu clave de API
-            language: "es", // Puedes cambiar el idioma según lo necesites
-            pretty: 1, // Resultados más legibles
-            no_annotations: 1, // Opcional: Evitar anotar datos extra
+            key: apiKey,
+            language: "es",
+            pretty: 1,
+            no_annotations: 1,
           },
         }
       );
-
       const addressData = response.data.results[0];
       if (addressData) {
-        setAddress(addressData.formatted); // Dirección formateada completa
-        // Buscar detalles adicionales en los componentes de la dirección
+        setAddress(addressData.formatted);
         const components = addressData.components;
-
-        // Aquí tratamos de encontrar un número de cuadra o manzana si está disponible
         if (components.road && components.house_number) {
           setBlock(
             `Número de cuadra: ${components.road}, No. ${components.house_number}`
@@ -106,23 +98,26 @@ const Map = () => {
       setLoading(false);
     }
   };
-
+  const addRoadDevice = () => {
+    if (map.current) {
+      setRoadDevices([...roadDevices, <RoadDevice key={roadDevices.length} />]);
+    }
+  };
   return (
     <div>
       <div>
-        {marker ? (
+        {stateMarker ? (
           <>
-            <p className="">Marcador: {marker}</p>
+            <p className="">Nuevo marcador</p>
             <button
               type="button"
-              className="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
-              onClick={addMarker}
+              onClick={addRoadDevice} // Función de agregar dispositivo vial
             >
               Agregar dispositivo vial
             </button>
           </>
         ) : (
-          <p>Ningun marcador por configurar</p>
+          <p>Ningún marcador por configurar</p>
         )}
         <div>
           {roadDevices.map((component, index) => (

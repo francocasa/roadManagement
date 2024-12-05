@@ -6,6 +6,7 @@ import {
 } from "react-router-dom";
 // import "./App.css";
 import HomePage from "./pages/HomePage";
+import CounterProvider from "./components/counter/Context";
 import ProfilePage from "./pages/ProfilePage";
 import Header from "./components/Header";
 import "./index.css";
@@ -27,31 +28,39 @@ const App = () => {
 
   // function App() {
   return (
-    <Router>
-      {isAuthenticated && <Header />}
-      <Routes>
-        {/* Ruta pública */}
-        <Route path="/profile" element={<ProfilePage />} />
+    <CounterProvider>
+      <Router>
+        {isAuthenticated && <Header />}
+        <Routes>
+          {/* Ruta pública */}
+          <Route path="/profile" element={<ProfilePage />} />
 
-        {/* Ruta protegida */}
-        <Route
-          path="/home"
-          element={isAuthenticated ? <HomePage /> : <Navigate to="/profile" />}
-        />
-        {/* Ruta protegida */}
-        <Route
-          path="/maps"
-          element={isAuthenticated ? <HomePage /> : <Navigate to="/profile" />}
-        />
-        {/* Ruta protegida */}
-        <Route
-          path="/lists"
-          element={isAuthenticated ? <HomePage /> : <Navigate to="/profile" />}
-        />
-        {/* Redirigir a login si la ruta no existe */}
-        <Route path="/" element={<Navigate to="/profile" />} />
-      </Routes>
-    </Router>
+          {/* Ruta protegida */}
+          <Route
+            path="/home"
+            element={
+              isAuthenticated ? <HomePage /> : <Navigate to="/profile" />
+            }
+          />
+          {/* Ruta protegida */}
+          <Route
+            path="/maps"
+            element={
+              isAuthenticated ? <HomePage /> : <Navigate to="/profile" />
+            }
+          />
+          {/* Ruta protegida */}
+          <Route
+            path="/lists"
+            element={
+              isAuthenticated ? <HomePage /> : <Navigate to="/profile" />
+            }
+          />
+          {/* Redirigir a login si la ruta no existe */}
+          <Route path="/" element={<Navigate to="/profile" />} />
+        </Routes>
+      </Router>
+    </CounterProvider>
   );
 };
 
