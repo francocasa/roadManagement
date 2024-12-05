@@ -12,6 +12,7 @@
   "dependencies": {
     "@auth0/auth0-react": "^2.2.4",
     "@types/mapbox-gl": "^3.4.1",
+    "axios": "^1.7.8",
     "mapbox-gl": "^3.8.0",
     "maplibre-gl": "^4.7.1",
     "react": "^18.3.1",

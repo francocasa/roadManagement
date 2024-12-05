@@ -5,13 +5,6 @@ const RoadDevice = () => {
   const [comment, setComment] = useState("");
   const [image, setImage] = useState(null);
 
-  // Estado para almacenar las características del producto
-  const [marker, setMarker] = useState({
-    road_device_type: "",
-    comment: "",
-    image: "",
-  });
-
   const road_device_types = [
     {
       id: 1,
